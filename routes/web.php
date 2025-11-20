@@ -4,7 +4,7 @@ use App\Models\Blog;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $feeds = \App\Models\Feed::all();
+    $feeds = \App\Models\Feed::get()->toArray();
 
     $blogs = Blog::select('title','url')
         ->take(14)

@@ -1,122 +1,248 @@
 {{-- resources/views/blogs.blade.php --}}
     <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Feed</title>
+    <title>Dev Feed – Twitter/Bluesky Style</title>
+
+    <!-- Twitter/Bluesky-like fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1"></script>
+
     <style>
-        /* Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
+        :root {
+            --bg: #000000;
+            --surface: #0e0e0e;
+            --card: #16181c;
+            --border: #2f3336;
+            --text-primary: #e7e9ea;
+            --text-secondary: #71767b;
+            --accent: #1d9bf0;
+            --accent-hover: #1a8cd8;
         }
 
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --surface: #f7f9f9;
+            --card: #ffffff;
+            --border: #cfd9de;
+            --text-primary: #0f1419;
+            --text-secondary: #536471;
+            --accent: #1d9bf0;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Fredoka', sans-serif;
-            background: #f9f5ff; /* روشن و بنفش روشن */
-            color: #4a148c; /* متن اصلی بنفش تیره */
-            line-height: 1.6;
-            padding: 2rem;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 16px;
         }
 
         h1 {
+            font-size: 24px;
+            font-weight: 800;
             text-align: center;
-            margin-bottom: 3rem;
-            font-size: 3rem;
-            color: #7e57c2; /* عنوان بنفش شفاف */
-            background: linear-gradient(90deg, #b39ddb, #7e57c2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin: 20px 0 40px;
+            color: var(--text-primary);
         }
 
-        .blog-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
+        .post {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            transition: background 0.2s;
         }
 
-        .blog-card {
-            background: #f3e5f5; /* پس‌زمینه روشن و بنفش پاستلی */
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 8px 20px rgba(158, 0, 255, 0.2);
-            transform: translateY(0);
-            opacity: 0;
-            animation: fadeInUp 0.8s forwards;
+        .post:hover {
+            background: rgba(255,255,255,0.03);
         }
 
-        .blog-card h3 {
-            color: #6a1b9a; /* بنفش تیره */
-            margin-bottom: 1rem;
-            font-size: 1.6rem;
+        [data-theme="light"] .post:hover {
+            background: #f7f9f9;
         }
 
-        .blog-card a {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: #ba68c8; /* دکمه بنفش */
-            color: white;
+        .post-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #333;
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+
+        .header-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .display-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .username {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .post-time {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .post-content {
+            margin: 8px 0 12px;
+            font-size: 15px;
+            word-wrap: break-word;
+        }
+
+        .post-title {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 425px;
+            margin-top: 12px;
+        }
+
+        .action {
+            display: flex;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 9999px;
+            transition: all 0.2s;
+        }
+
+        .action:hover {
+            background: rgba(29, 155, 240, 0.1);
+            color: var(--accent);
+        }
+
+        .action.like:hover   { background: rgba(249, 24, 128, 0.1); color: #f918e9e; }
+        .action.repost:hover { background: rgba(0, 186, 124, 0.1); color: #00ba7c; }
+        .action.bookmark:hover { background: rgba(29, 155, 240, 0.1); color: var(--accent); }
+
+        .action i { font-size: 18px; }
+
+        .external-link {
+            color: var(--accent);
             text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(186, 104, 200, 0.3);
+            font-weight: 500;
         }
 
-        .blog-card a:hover {
-            background: #9c27b0;
-            transform: translateY(-2px);
+        .external-link:hover {
+            text-decoration: underline;
         }
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Responsive tweaks */
-        @media (max-width: 600px) {
-            body {
-                padding: 1rem;
-            }
-
-            h1 {
-                font-size: 2.4rem;
-            }
-
-            .blog-card h3 {
-                font-size: 1.4rem;
-            }
+        /* Simple theme toggle (optional) */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<h1>Feeds</h1>
-@foreach($feeds as $blog)
-    <div class="blog-card" style="display: flex; justify-content: space-between; align-items: center;margin-top: 10px;">
-        <h3>{!! $blog['title'] ?? null !!}</h3>
-        <a href="{{$blog['url']}}" target="_blank">Follow</a>
-    </div>
-@endforeach
+<div class="container">
 
-<hr />
-<h1>Blogs</h1>
-<div class="blog-container">
-    @foreach($blogs as $blog)
-        <div class="blog-card">
-            <h3>{!! $blog['title'] ?? null !!}</h3>
-            <a href="{{$blog['url']}}" target="_blank">Visit Blog</a>
+    <h1>Dev Feed</h1>
+
+    <!-- All feeds + blogs in one chronological timeline -->
+    @foreach(array_merge(
+        array_map(fn($f) => array_merge($f, ['type' => 'feed'] ), $feeds),
+        array_map(fn($b) => array_merge($b, ['type' => 'blog'] ), $blogs)
+    ) as $item)
+
+        <div class="post">
+            <div class="post-header">
+                <img src="{{ $item['avatar'] ?? 'https://api.dicebear.com/7.x/identicon/svg?seed=' . urlencode($item['title']) }}"
+                     alt="avatar" class="avatar">
+
+                <div class="header-info">
+                    <div class="display-name">{{ $item['title'] ?? 'Unknown' }}</div>
+                    <div class="username">@{{ Str::slug($item['title'] ?? 'unknown') }}</div>
+                </div>
+
+                <div class="post-time">
+                    {{ $item['updated'] ?? now()->diffForHumans() }}
+                </div>
+            </div>
+
+            <div class="post-content">
+                @if(($item['type'] ?? null) === 'feed')
+                    <div class="post-title">New posts on this RSS feed</div>
+                    <p>Follow the latest articles and updates.</p>
+                @else
+                    <div class="post-title">New blog post published</div>
+                    <p>Check out the latest article on this dev blog.</p>
+                @endif
+
+                <a href="{{ $item['url'] }}" target="_blank" class="external-link">
+                    {{ $item['url'] }}
+                </a>
+            </div>
+
+            <div class="post-actions">
+                <div class="action reply">
+                    <i class="ph ph-chat-circle"></i>
+                    <span>12</span>
+                </div>
+                <div class="action repost">
+                    <i class="ph ph-repeat"></i>
+                    <span>8</span>
+                </div>
+                <div class="action like">
+                    <i class="ph ph-heart"></i>
+                    <span>67</span>
+                </div>
+                <div class="action bookmark">
+                    <i class="ph ph-bookmark-simple"></i>
+                </div>
+            </div>
         </div>
     @endforeach
+
 </div>
+
+<!-- Optional theme toggle -->
+<div class="theme-toggle" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'">
+    <i class="ph ph-moon"></i> / <i class="ph ph-sun"></i>
+</div>
+
 </body>
 </html>
