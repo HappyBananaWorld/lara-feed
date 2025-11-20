@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Blog;
+use App\Models\Feed;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Noki\XmlConverter\Convert;
@@ -12,13 +14,24 @@ class FetchFeedContentsService
     {
     }
 
-    public function fetch()
+    public function saveItems()
+    {
+        $urls = Feed::pluck('url')->toArray();
+
+        foreach ($urls as $url) {
+            $data = $this->fetch($url);
+
+            foreach ($data as $d)
+            {
+                Blog::create($d);
+            }
+        }
+    }
+
+    public function fetch($url)
     {
         $client = new Client();
-        $resp = $client->request('GET',
-,
-//            ,
-            [
+        $resp = $client->request('GET',$url,[
             'headers' => [
                 'Accept' => 'application/xml',
                 'User-Agent' => 'Mozilla/5.0'
@@ -56,7 +69,7 @@ class FetchFeedContentsService
         foreach ($xml->channel->item as $item) {
             $items[] = [
                 'title' => (string) $item->title,
-                'link' => (string) $item->link,
+                'url' => (string) $item->link,
                 'description' => (string) $item->description,
             ];
         }
@@ -71,7 +84,7 @@ class FetchFeedContentsService
         foreach ($xml->item as $item) {
             $items[] = [
                 'title' => (string) $item->title,
-                'link' => (string) $item->link,
+                'url' => (string) $item->link,
                 'description' => (string) $item->description,
             ];
         }
@@ -86,7 +99,7 @@ class FetchFeedContentsService
         foreach ($xml->entry as $item) {
             $items[] = [
                 'title' => (string) $item->title,
-                'link' => isset($item->link['href']) ? (string) $item->link['href'] : '',
+                'url' => isset($item->link['href']) ? (string) $item->link['href'] : '',
                 'description' => (string) ($item->summary ?: $item->content),
             ];
         }

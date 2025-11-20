@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('blogs', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('title');
-            $table->text('description');
-            $table->string('slug');
+            $table->text('description')->nullable();
+            $table->string('slug')->nullable();
             $table->string('url');
             $table->enum('status',array_column(\App\BlogStatusEnum::cases(),'value'));
             $table->softDeletes();
