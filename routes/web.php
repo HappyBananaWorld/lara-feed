@@ -1,14 +1,15 @@
 <?php
 
+use App\Models\Blog;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $f =     app(\App\Services\FetchFeedContentsService::class);
-    $data = $f->saveItems();
+    $feeds = \App\Models\Feed::all();
 
-//    return $data;
-//    return response()->json([
-//        'items'=>$data['channel']['item'],
-//        'data'=>$data
-//    ]);
+    $blogs = Blog::select('title','url')
+        ->take(14)
+        ->get()
+    ->toArray();
+
+    return view('blogs',compact('blogs','feeds'));
 });
