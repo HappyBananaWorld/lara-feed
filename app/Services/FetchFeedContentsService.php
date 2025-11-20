@@ -16,8 +16,8 @@ class FetchFeedContentsService
     {
         $client = new Client();
         $resp = $client->request('GET',
-"https://dev.to/rss",
-//            'https://feed.laravel-news.com',
+,
+//            ,
             [
             'headers' => [
                 'Accept' => 'application/xml',
@@ -27,6 +27,8 @@ class FetchFeedContentsService
         ]);
         $xmlString = $resp->getBody()->getContents();
         $xml = simplexml_load_string($xmlString, "SimpleXMLElement", LIBXML_NOCDATA);
+
+        // later use rss reader pakage: RssReader or FeedReader
 
         return $this->parse($xml);
     }
